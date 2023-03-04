@@ -6,19 +6,19 @@ from telebot import types
 import sys
 from spotipy.oauth2 import SpotifyClientCredentials
 
-token = "6104472904:AAGdgAniuOY3zHf-7OXH5SAlNV_GmtcnRM0"
+token = "6104472904:AAGdgAniuOY3zHf-7OXН5SAlNV_GmtcnRM0"
 bot = telebot.TeleBot(token)
 
-client_id = "e9f794eb35d8483d86dc0bd8b04dc76e"
+client_id = "e9f7a94eb35d483d86dc0bd8b04dc76e"
 client_secret = "888651fbda704dcdaf387368b554d871"
-REDIRECT_URI = 'http://localhost:8888/callback'
+REDIRECTURI = 'http://localhost:8888/callback'
 
 # Права доступа к API Spotify
 SCOPE = 'user-library-read'
 
 
 def authorize_spotify(user_id):
-    token = util.prompt_for_user_token(user_id, SCOPE, client_id, client_secret, REDIRECT_URI)
+    token = util.prompt_for_user_token(user_id, SCOPE, clientid, client_secret, REDIRECT_URI)
     sp = spotipy.Spotify(auth=token)
     return sp
 
@@ -37,7 +37,7 @@ def start(update):
 # Функция для обработки команды /auth
 @bot.message_handler(commands=['auth'])
 def auth(update):
-    user_id = update.chat.id
+    user_id = update.chatid
     sp = authorize_spotify(user_id)
     if sp:
         message = 'Вы успешно авторизовались в Spotify. Теперь вы можете искать музыку. Напиши /findsong, там дальнейшая инструкция'
@@ -47,21 +47,10 @@ def auth(update):
 
 
 
-@bot.message_handler(commands=['help'])
+@bot.message_handler(commands['help'])
 def get_text_messages(message):
     bot.send_message(message.from_user.id,
                      "/findsong - найти песню по названию и исполнителю, /findmus - найти исполнителя")
-
-
-@bot.message_handler(commands=['findsong'])
-def get_text_messages(message):
-    bot.send_message(message.chat.id,
-                     text='Напишите название и имя исполнителя, к примеру: Snoop Dogg - Drop It Like Its Hot')
-
-
-@bot.message_handler(commands=['findmus'])
-def find_musician(message):
-    bot.send_message(message.chat.id, 'Напишите имя исполнителя')
 
 
 @bot.message_handler(func=lambda message: True)
@@ -81,8 +70,6 @@ def import_song(message):
             break
 
     # Поиск песни в Spotify
-    results = sp.search(q='track:{} artist:{}'.format(song_name, artist_name), type='track')
-
     # Если названия песни и исполнителя не найдены, то сообщаем об ошибке
     if song_name is None or artist_name is None:
         bot.send_message(message.chat.id,
@@ -96,5 +83,3 @@ def import_song(message):
         bot.send_message(message.chat.id, 'Вот твоя песня: {}'.format(preview_url))
     else:
         bot.send_message(message.chat.id, 'К сожалению, я не смог найти эту песню.')
-
-bot.infinity_polling()
