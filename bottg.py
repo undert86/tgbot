@@ -5,6 +5,8 @@ import telebot
 from telebot import types
 from googleapiclient.discovery import build
 import yt_dlp as youtube_dl
+import io
+import requests
 # Получаем credentials для Spotify API
 credentials = oauth2.SpotifyClientCredentials(
     client_id='e9f794eb35d8483d86dc0bd8b04dc76e',
@@ -59,6 +61,10 @@ def echo(message):
             track_artist = track_data['artists'][0]['name']
             track_preview_url = track_data['preview_url']
             track_cover_url = track_data['album']['images'][0]['url']
+            response = requests.get(track_cover_url, headers={'Content-Type': 'image/jpeg'})
+            if response.status_code == 200:
+                photo = io.BytesIO(response.content)
+                bot.send_photo(message.chat.id, photo, caption=f'{track_artist} - {track_name}')
 
             if not track_preview_url:
                 bot.reply_to(message, 'К сожалению, для этого трека нет превью.')
